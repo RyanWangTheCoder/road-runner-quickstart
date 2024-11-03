@@ -11,26 +11,27 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-@TeleOp(name="LimeLightTest", group="Teleop")
+@TeleOp(name="LimeLightTest", group="TeleOp")
 public class LimeLightTest  extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        String TAG = "LimteLight";
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
-
-        Limelight3A limelight = new Limelight3A();
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
-        String TAG = "LimteLight";
+        Limelight3A limelight;// = new Limelight3A();
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100);
+        limelight.start();
+        limelight.pipelineSwitch(0);  // Switch to pipeline 0
 
+        // Wait for the Limelight to initialize
+        sleep(2000);
         waitForStart();
         /*
          * Starts polling for data.
          */
-        limelight.start();
         while (opModeIsActive()) {
             LLResult result = limelight.getLatestResult();
             if (result != null) {
@@ -49,10 +50,11 @@ public class LimeLightTest  extends LinearOpMode {
             }
             else {
                 Log.d(TAG, "NULL result");
-                Log.d(TAG, "" + limelight.isConnected() + " time " + limelight.getTimeSinceLastUpdate());
+                Log.d(TAG, "connected? " + limelight.isConnected() + " time " + limelight.getTimeSinceLastUpdate());
                 limelight.reloadPipeline();
-                Log.d(TAG, "" + limelight.getStatus());
-                Log.d(TAG, "" + limelight.isRunning());
+                Log.d(TAG, "status: " + limelight.getStatus());
+                Log.d(TAG, "Running? " + limelight.isRunning());
+                Log.d(TAG, "" + limelight.captureSnapshot("test"));
 
                 telemetry.addData("NULL", "result");
 
